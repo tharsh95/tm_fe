@@ -1,0 +1,93 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+@media (min-width: 768px) {
+  .table-row {
+    display: flex;
+  }
+
+  .table-cell {
+    flex: 1;
+    padding: 8px;
+  }
+
+  .table-cell[data-label]:before {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+}
+
+@media (max-width: 767px) {
+  .table-row {
+    display: block;
+    border: 1px solid #ccc;
+    margin-bottom: 16px;
+  }
+
+  .table-cell {
+    padding: 8px;
+  }
+
+  .table-cell[data-label]:before {
+    content: attr(data-label);
+    font-weight: bold;
+    display: block;
+    margin-bottom: 4px;
+  }
+}
+.edit-date-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .edit-date-button {
+    background-color: #0074b8;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+.navbar{
+  
+    width:100vw;
+    background-color: #9c27b0;
+    height:10vh;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-left-radius: 5px; /* Adjust the value as needed */
+    border-bottom-right-radius: 5px;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.navbar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex; /* Display list items horizontally */
+    justify-content: center; /* Center-align the list items horizontally */
+   
+  }
+  
+  /* Style list items (li) */
+  .navbar li {
+    margin: 0 10px; /* Add spacing between list items */
+  }
+  
+  /* Style anchor tags (a) */
+  .navbar a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  /* Change the link color on hover */
+  .navbar a:hover {
+    color: yellow;
+  }

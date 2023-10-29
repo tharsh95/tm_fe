@@ -1,0 +1,15 @@
+/* .card{
+   display: flex;
+   flex-direction: row;
+   background-color: rgb(14, 13, 13);
+   align-items: center;
+   justify-content: space-between;
+ }
+ .textField {
+   margin-right:2rem;
+   flex: 1, 
+ }
+ .button {
+     background-color: chartreuse;
+   margin-left:2rem 
+ } */
