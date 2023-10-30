@@ -12,12 +12,12 @@ import {
   Select,
   FormHelperText,
 } from "@mui/material";
+import { useUserContext } from '../Contexts/userContext'; 
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "axios";
 import { SnackbarProvider, enqueueSnackbar } from "notistack";
 import UserTable from "./UserTable";
-import { AttachEmail } from "@mui/icons-material";
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required("Name is required"),
@@ -28,6 +28,8 @@ const validationSchema = Yup.object().shape({
 
 function HorizontalCard() {
   const [users, setUsers] = useState([]);
+  const { user, setUser } = useUserContext(); 
+console.log(user,'ok')
   const initialValues = {
     name: "",
     email: "",

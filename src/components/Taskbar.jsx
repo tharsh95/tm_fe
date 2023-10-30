@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -7,15 +7,20 @@ import {
   IconButton,
   Menu,
   MenuItem,
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import { Link } from 'react-router-dom';
+  Tooltip,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import { BrowserRouter as Router } from "react-router-dom";
+
+import { NavLink } from "react-router-dom";
+import { useUserContext } from "../Contexts/userContext";
+import { useNavigate } from "react-router-dom"; // Use 'useNavigate' for React Router v6
 
 function Navbar() {
-  // State for controlling the dropdown menu
   const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate(); // Get the navigation function
 
-  // Open the dropdown menu
+  const { user, setUser } = useUserContext();
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -23,26 +28,75 @@ function Navbar() {
     setAnchorEl(null);
   };
 
-  // Close the dropdown menu
   const handleLogout = () => {
-    localStorage.clear()
+    navigate("/");
+    localStorage.clear();
     setAnchorEl(null);
-    window.location.reload()
+    window.location.reload();
   };
-  const handleProfile=()=>{
-
-  }
+  const handleProfile = () => {
+    navigate("/profile");
+    handleMenuClose();
+  };
 
   return (
     <div>
-      <AppBar position="static" style={{marginBottom:"1rem"}}>
+      
+      <AppBar position="static" style={{ marginBottom: "1rem" }}>
         <Toolbar>
-          <Typography variant="h6" style={{ flexGrow: 1 }}>
-            My App
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            <Tooltip title={user?.email}>{user?.name}</Tooltip>
           </Typography>
-         <Button> <Link to="/" style={{textDecoration:"none",color:"white"}}>Tasks</Link></Button>
-          {/* <Button color="inherit"><Link to='/add'>Invite</Link></Button> */}
-          <Button color="inherit"><Link to="/add" style={{textDecoration:"none",color:"white"}}>Invite</Link></Button>
+          <Button>
+            <NavLink
+              to="/"
+              style={{
+                textDecoration: "none",
+                color: "white",
+                // fontWeight: 'bold',
+              }}
+              activeStyle={{
+                color: "black",
+                textDecoration: "underline",
+              }}
+            >
+              Tasks
+            </NavLink>
+          </Button>
+          {user?.role === "Manager" && (
+            <>
+              <Button color="inherit">
+                <NavLink
+                  to="/add"
+                  style={{
+                    textDecoration: "none",
+                    color: "white",
+                    // fontWeight: 'bold',
+                  }}
+                  activeStyle={{
+                    color: "black",
+                  }}
+                >
+                  Invite
+                </NavLink>
+              </Button>
+              <Button color="inherit">
+                <NavLink
+                  to="/trash"
+                  style={{
+                    textDecoration: "none",
+                    color: "white",
+                    // fontWeight: 'bold',
+                  }}
+                  activeStyle={{
+                    color: "black",
+                  }}
+                >
+                  Trash
+                </NavLink>
+              </Button>
+            </>
+          )}
           <IconButton
             color="inherit"
             onClick={handleMenuOpen}
@@ -56,13 +110,13 @@ function Navbar() {
             id="menu-appbar"
             anchorEl={anchorEl}
             anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
+              vertical: "top",
+              horizontal: "right",
             }}
             keepMounted
             transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
+              vertical: "top",
+              horizontal: "right",
             }}
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}

@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from "react";
-import TaskTable from "./components/TaskTable";
-import { GoogleLogin, googleLogout } from "@react-oauth/google";
+import React from "react";
+import { UserProvider } from './Contexts/userContext'; // Import your UserProvider
+import { BrowserRouter as Router } from 'react-router-dom';
 
 import Container from "./Container";
-import Invite from "./components/Invite";
 const App = () => {
-  const [tasks, setTasks] = useState([]);
 
   return (
-    <>
-      <Container />
-     
-    </>
+      <UserProvider>
+        <Container />
+      </UserProvider>
   );
 };
 

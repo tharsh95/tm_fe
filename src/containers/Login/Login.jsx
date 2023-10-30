@@ -8,10 +8,11 @@ import {
   TextField,
 } from "@mui/material";
 import { SnackbarProvider, enqueueSnackbar } from "notistack";
-
+import { useNavigate } from "react-router";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import './Login.css'
 
 const validationSchema = Yup.object().shape({
   email: Yup.string()
@@ -45,10 +46,8 @@ const Login = () => {
     });
   }, []);
   const handleLogin = async (values, { setSubmitting }) => {
-    // Your login logic here
     const url = "http://localhost:3000/login";
     const { data } = await axios.post(url, values);
-
     if (data.status === "success") {
       localStorage.setItem("token", data.token);
       localStorage.setItem("google", false);

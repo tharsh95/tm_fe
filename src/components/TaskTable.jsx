@@ -21,44 +21,88 @@ import {
   DialogActions,
   FormHelperText,
 } from "@mui/material";
+import { SnackbarProvider, enqueueSnackbar } from "notistack";
 
+import { useUserContext } from "../Contexts/userContext"; // Import the useUserContext hook
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import "./TaskTable.css";
 import axios from "axios";
+import EditForm from "./EditForm";
 
 const columns = [
+  { id: "id", label: "Id" },
   { id: "title", label: "Title" },
   { id: "description", label: "Description" },
   { id: "link", label: "Link" },
   { id: "status", label: "Status" },
   { id: "assignee", label: "Assignee" },
-  { id: "duedate", label: "Due Date" },
-  { id: "delete", label: "Delete" },
+  //   { id: "duedate", label: "Due Date" },
   { id: "edit", label: "Edit" },
+  { id: "delete", label: "Delete" },
 ];
 
 const validationSchema = Yup.object().shape({
   description: Yup.string().required("Description is required"),
   title: Yup.string().required("Title is required"),
-  assignee: Yup.string().required("Assignee is required"),
+  //   assignee: Yup.string().required("Assignee is required"),
+  status: Yup.string().required("Status is required"),
   link: Yup.string().required("Link is required"),
 });
 
-const TaskTable = ({ tasks, setTasks }) => {
+const TaskTable = () => {
   const [showForm, setShowForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [flaf, setFlag] = useState(false);
   const [data, setData] = useState([]);
   const [users, setUsers] = useState([]);
-  const handleDelete = (taskId) => {};
+  const [editData, setEditData] = useState(null);
+  const { user, setUser } = useUserContext();
+
+  const handleEdit = (taskId) => {
+    const taskToEdit = data.find((task) => task.id === taskId);
+    const { login, ...taskToEditWithoutLogin } = taskToEdit;
+
+    setEditData(taskToEditWithoutLogin);
+    toggleEditForm();
+  };
+  const handleDelete = async (taskId) => {
+    const url = `http://localhost:3000/tasks/${taskId}`;
+    const { data } = await axios.post(url, {
+      user: user?.name,
+      role: user?.role,
+    });
+    console.log(data, "delete");
+    if (data.status === "success") {
+      setData(data.data.data);
+    } else {
+      enqueueSnackbar(data.message, { variant: "error" });
+    }
+  };
+
   const toggleForm = () => {
     setShowForm(!showForm);
   };
+  const toggleEditForm = (data, type) => {
+    setShowEditForm(!showEditForm);
+  };
+
   const fetchTasks = async () => {
     const url = "http://localhost:3000/tasks";
     const { data } = await axios.get(url);
     setData(data.data);
+  };
+  const handleFilterChange = (e) => {
+    console.log(e.target.value);
+    if (e.target.value !== "All") {
+      const fdata = data.filter((el) => el.status === e.target.value);
+      console.log(fdata);
+      setData(fdata);
+    } else {
+      setFlag(!flag);
+    }
   };
   const fetchUsers = async () => {
     const url = "http://localhost:3000/login/list";
@@ -68,6 +112,7 @@ const TaskTable = ({ tasks, setTasks }) => {
 
     setUsers(data);
   };
+
   useEffect(() => {
     fetchTasks();
     fetchUsers();
@@ -88,9 +133,7 @@ const TaskTable = ({ tasks, setTasks }) => {
     } = await axios.post(url, values);
     setData(data.data);
     resetForm(initialValues);
-  };
-  const handleFilterBy = (e) => {
-    console.log(e.target.value);
+    console.log(url);
   };
   return (
     <>
@@ -98,24 +141,22 @@ const TaskTable = ({ tasks, setTasks }) => {
         <Grid item xs={12} md={6}>
           <Button
             variant="contained"
-            color="secondary"
+            color="primary"
             onClick={toggleForm}
             style={{ marginBottom: "20px" }}
           >
-            {showForm ? "Hide Form" : "Show Form"}
+Add Task
           </Button>
         </Grid>
         <Grid item xs={12} md={6} justifyContent="space-around">
-          <FormControl variant="outlined" sx={{ width: "200px" }}>
-            <InputLabel htmlFor="status">Status</InputLabel>
-            <Select name="status" label="Status" onChange={handleFilterBy}>
-              <MenuItem value="backlog">Backlog</MenuItem>
-              <MenuItem value="assignee">On Hold</MenuItem>
-            </Select>
-          </FormControl>
-          <FormControl variant="outlined" sx={{ width: "200px" }}>
-            <InputLabel htmlFor="assignee">Filter</InputLabel>
-            <Select name="assignee" label="Filter">
+          <FormControl variant="outlined" sx={{ width: "200px",backgroundColor:'white' }}>
+            <InputLabel htmlFor="assignee">Filter by status</InputLabel>
+            <Select
+              name="assignee"
+              label="Filter"
+              onChange={handleFilterChange}
+            >
+              <MenuItem value="All">All</MenuItem>
               <MenuItem value="Backlog">Backlog</MenuItem>
               <MenuItem value="WIP">WIP</MenuItem>
               <MenuItem value="On Hold">On Hold</MenuItem>
@@ -137,6 +178,7 @@ const TaskTable = ({ tasks, setTasks }) => {
                 <Grid container spacing={2}>
                   {columns.map(
                     (column) =>
+                      column.id === "id" ||
                       column.id === "delete" ||
                       column.id === "status" ||
                       column.id === "duedate" ||
@@ -241,7 +283,7 @@ const TaskTable = ({ tasks, setTasks }) => {
                         )}
                         {column.id === "delete" && (
                           <IconButton
-                            color="secondary"
+                            color="primary"
                             onClick={() => handleDelete(task.id)}
                           >
                             <DeleteIcon />
@@ -249,15 +291,15 @@ const TaskTable = ({ tasks, setTasks }) => {
                         )}
                         {column.id === "edit" && (
                           <IconButton
-                            color="secondary"
-                            onClick={() => handleDelete(task.id)}
+                            color="primary"
+                            onClick={() => handleEdit(task.id)}
                           >
                             <EditIcon />
                           </IconButton>
                         )}
 
                         {column.id === "link" || <>{task[column.id]}</>}
-                        {column.id === "assignee" && task.login.name}
+                        {column.id === "assignee" && task?.login?.name}
                       </TableCell>
                     ))}
                   </TableRow>
@@ -265,27 +307,17 @@ const TaskTable = ({ tasks, setTasks }) => {
               </TableBody>
             </Table>
           </TableContainer>
+          <EditForm
+            showEditForm={showEditForm}
+            toggleEditForm={toggleEditForm}
+            editData={editData}
+            columns={columns}
+            users={users}
+            validationSchema={validationSchema}
+            handleDelete={handleDelete}
+          />
         </Grid>
-        {/* <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>Select a Date</DialogTitle>
-          <DialogContent>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <Grid container m={1}>
-                <Grid item xs={12}>
-                  <MobileDatePicker
-                    label="Date mobile"
-                    inputFormat="DD/MM/YYYY"
-                    name="duedate"
-                    value={selectedDate}
-                    onChange={handleDateChange}
-                    renderInput={(params) => <TextField {...params} />}
-                  />
-                </Grid>
-              </Grid>
-            </LocalizationProvider>
-          </DialogContent>
-          <DialogActions></DialogActions>
-        </Dialog> */}
+        <SnackbarProvider />
       </Grid>
     </>
   );
