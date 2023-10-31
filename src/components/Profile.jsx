@@ -17,6 +17,7 @@ import Typography from "@mui/material/Typography";
 import { useUserContext } from "../Contexts/userContext";
 import axios from "axios";
 import { SnackbarProvider, enqueueSnackbar } from "notistack";
+import { textAlign } from "@mui/system";
 
 const MyCard = () => {
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -27,35 +28,17 @@ const MyCard = () => {
     setIsChangingPassword(true);
   };
   const handleSavePassword = async () => {
-    // Add logic to save the new password
     if (newPassword) {
       const url = "http://localhost:3000/login/changepwd";
-      console.log(url, newPassword, user?.email);
       const data = await axios.patch(url, { newPassword, email: user?.email });
       setIsChangingPassword(false);
       setNewPassword("");
       enqueueSnackbar("Password Succesfully changed", { variant: "success" });
     }
   };
-//   const tableData = [
-//     {
-//       id: 1,
-//       title: "Sample Title 1",
-//       description: "Description 1",
-//       link: "Link 1",
-//       status: "Active",
-//     },
-//     {
-//       id: 2,
-//       title: "Sample Title 2",
-//       description: "Description 2",
-//       link: "Link 2",
-//       status: "Inactive",
-//     },
-//     // Add more rows as needed
-//   ];
   const fetchTasks = async () => {
     const url = `http://localhost:3000/tasks/${user?.id}`;
+    console.log(user)
     const { data } = await axios.get(url);
     setTableData(data)
 
@@ -102,7 +85,7 @@ const MyCard = () => {
           )}
         </CardContent>
       </Card>
-      <Typography variant="h4" style={{ margin: "16px 0" }}>
+      <Typography variant="h4" style={{ margin: "16px 0" ,textAlign:'center'}}>
         {`${user?.name} Tasks`}
       </Typography>
 
