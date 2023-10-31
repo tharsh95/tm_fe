@@ -8,7 +8,7 @@ $ npm install
 
 ```bash
 # development
-$ npm run start
+$ npm run dev
 ```
 ## Now got to the browser(http://localhost:5173)
 
